@@ -191,9 +191,9 @@ async function handleMessage(event, client) {
     replyText = `輸入「help」看全部指令 🙂\n\n或者直接說：\n「打卡」「抽卡」「我的紀錄」「鼓勵」`;
   }
 
-  await client.replyMessage(event.replyToken, {
-    type: 'text',
-    text: replyText,
+  await client.replyMessage({
+    replyToken: event.replyToken,
+    messages: [{ type: 'text', text: replyText }],
   });
 }
 
@@ -208,9 +208,9 @@ async function handleFollow(event, client) {
 
   await db.getOrCreateUser(userId, displayName);
 
-  await client.replyMessage(event.replyToken, {
-    type: 'text',
-    text: handleWelcome(displayName),
+  await client.replyMessage({
+    replyToken: event.replyToken,
+    messages: [{ type: 'text', text: handleWelcome(displayName) }],
   });
 }
 
