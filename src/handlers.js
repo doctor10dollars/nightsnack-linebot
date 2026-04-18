@@ -33,16 +33,16 @@ function getMilestone(streak) {
 // 所有按鈕文字集中管理
 const T = {
   START:          '今晚開始',
-  ENCOURAGE:      '鼓勵我',
-  RECORD:         '我的紀錄',
+  ENCOURAGE:      '撐不住了... 鼓勵我',
+  RECORD:         '我沒吃宵夜的紀錄',
   CRAVING:        '我有點想吃',
   STAY:           '陪我一下',
   WATER:          '我去喝水',
   WATER_BACK:     '我回來了',
   STILL_CRAVING:  '還是想吃',
   SUCCESS:        '我撐住了',
-  DRAW:           '抽卡',
-  BREAK:          '我破功了',
+  DRAW:           '抽今日愛自己小卡',
+  BREAK:          '我... 破功了... 吃了',
   TOMORROW:       '明天再開始',
   MORE_ENCOURAGE: '再給我一句',
   AGAIN:          '再撐一下',
@@ -50,6 +50,7 @@ const T = {
   AGAIN_DRAW:     '再抽一次',
   CHECKIN_LATER:  '晚點打卡',
   STILL_HERE:     '我還在撐',
+  CHECKIN:        '今天沒吃宵夜打卡',
 };
 
 async function handleWelcome(event, client) {
@@ -72,7 +73,6 @@ async function handleEncourage(event, client) {
   ]);
 }
 
-// 「我有點想吃」→ handleCraving
 async function handleCraving(event, client, userId, displayName) {
   const user = await db.getOrCreateUser(userId, displayName);
   const status = await db.getTodayStatus(user.id);
@@ -84,7 +84,6 @@ async function handleCraving(event, client, userId, displayName) {
   ]);
 }
 
-// 「還是想吃」→ handleStillCraving（獨立處理）
 async function handleStillCraving(event, client, userId, displayName) {
   const user = await db.getOrCreateUser(userId, displayName);
   const status = await db.getTodayStatus(user.id);
@@ -167,7 +166,6 @@ async function handleDraw(event, client, userId, displayName) {
   const card = drawCard(stats.total_checkins);
   await db.saveDraw(user.id, card.id);
 
-  // 判斷是否為新卡
   const { isNew } = await db.collectCard(user.id, card.id);
 
   const messages = [];
@@ -256,25 +254,26 @@ async function handleMessage(event, client) {
   } catch (e) {}
 
   switch (text) {
-    case T.START:          return handleStart(event, client, userId, displayName);
+    case T.CHECKIN:
+    case '打卡':                return handleSuccess(event, client, userId, displayName);
+    case T.START:               return handleStart(event, client, userId, displayName);
     case T.ENCOURAGE:
     case T.MORE_ENCOURAGE:
     case T.AGAIN:
-    case T.STILL_HERE:     return handleEncourage(event, client);
-    case T.RECORD:         return handleRecord(event, client, userId, displayName);
-    case T.CRAVING:        return handleCraving(event, client, userId, displayName);       // ✅ 正確路由
-    case T.STILL_CRAVING:  return handleStillCraving(event, client, userId, displayName); // ✅ 獨立路由
-    case T.STAY:           return handleStay(event, client);
-    case T.WATER:          return handleWater(event, client);
-    case T.WATER_BACK:     return handleWaterBack(event, client);
+    case T.STILL_HERE:          return handleEncourage(event, client);
+    case T.RECORD:              return handleRecord(event, client, userId, displayName);
+    case T.CRAVING:             return handleCraving(event, client, userId, displayName);
+    case T.STILL_CRAVING:       return handleStillCraving(event, client, userId, displayName);
+    case T.STAY:                return handleStay(event, client);
+    case T.WATER:               return handleWater(event, client);
+    case T.WATER_BACK:          return handleWaterBack(event, client);
     case T.SUCCESS:
-    case '打卡':
-    case T.CHECKIN_LATER:  return handleSuccess(event, client, userId, displayName);
+    case T.CHECKIN_LATER:       return handleSuccess(event, client, userId, displayName);
     case T.DRAW:
-    case T.AGAIN_DRAW:     return handleDraw(event, client, userId, displayName);
-    case T.BREAK:          return handleBreak(event, client, userId, displayName);
-    case T.TOMORROW:       return handleTomorrow(event, client);
-    case T.LESSON:         return handleLesson(event, client);
+    case T.AGAIN_DRAW:          return handleDraw(event, client, userId, displayName);
+    case T.BREAK:               return handleBreak(event, client, userId, displayName);
+    case T.TOMORROW:            return handleTomorrow(event, client);
+    case T.LESSON:              return handleLesson(event, client);
     default:
       await reply(client, replyToken, [
         textMsg('點下方選單就可以囉 🌙', T.START, T.ENCOURAGE, T.RECORD),
