@@ -282,6 +282,12 @@ async function handleFollow(event, client) {
   } catch (e) {}
 
   await db.getOrCreateUser(userId, displayName);
+  await reply(client, event.replyToken, [
+    textMsg(
+      '嗨！我是宵夜掰掰🌙 十元醫師派我來陪你的 😊\n不節食、不極端，不吃宵夜就好，我們一起 🫶',
+      T.DRAW, T.RECORD, T.ENCOURAGE
+    ),
+  ]);
 }
 
 module.exports = { handleMessage, handleFollow, T };
