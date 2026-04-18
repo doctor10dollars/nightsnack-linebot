@@ -3,7 +3,6 @@ const { drawCard, getSeriesInfo, getTotalCardCount } = require('./cards');
 const { reply, textMsg, imageMsg } = require('./line');
 const {
   randomPick,
-  welcomeMessages,
   startMessages,
   encouragementMessages,
   cravingMessages,
@@ -51,12 +50,6 @@ const T = {
   STILL_HERE:     '我還在撐',
   CHECKIN:        '今天沒吃宵夜打卡',
 };
-
-async function handleWelcome(event, client) {
-  await reply(client, event.replyToken, [
-    textMsg(randomPick(welcomeMessages), T.START, T.ENCOURAGE, T.RECORD),
-  ]);
-}
 
 async function handleStart(event, client, userId, displayName) {
   const user = await db.getOrCreateUser(userId, displayName);
@@ -289,7 +282,6 @@ async function handleFollow(event, client) {
   } catch (e) {}
 
   await db.getOrCreateUser(userId, displayName);
-  await handleWelcome(event, client);
 }
 
 module.exports = { handleMessage, handleFollow, T };
