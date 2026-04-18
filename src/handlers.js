@@ -30,7 +30,6 @@ function getMilestone(streak) {
   return MILESTONES.find(m => streak === m.days) || null;
 }
 
-// 所有按鈕文字集中管理
 const T = {
   START:          '今晚開始',
   ENCOURAGE:      '撐不住了... 鼓勵我',
@@ -222,7 +221,7 @@ async function handleRecord(event, client, userId, displayName) {
   const statusText = statusMap[todayStatus?.status || 'idle'];
 
   const msg = `📊 ${displayName} 的紀錄
-━━━━━━━━━━━━
+──────
 今日狀態：${statusText}
 🔥 連續天數：${stats.current_streak} 天
 🏅 最長紀錄：${stats.max_streak} 天
