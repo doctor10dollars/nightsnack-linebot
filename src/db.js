@@ -5,8 +5,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-const today = () => new Date().toISOString().split('T')[0];
-const yesterday = () => new Date(Date.now() - 86400000).toISOString().split('T')[0];
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+const yesterday = () => new Date(Date.now() - 86400000).toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
 
 async function getOrCreateUser(lineUserId, displayName) {
   let { data: user } = await supabase
@@ -117,7 +117,6 @@ async function doBreak(userId) {
 
   const stats = await getUserStats(userId);
 
-  // 如果今天已打卡成功，移除 checkin 並扣回 total_checkins
   const { data: todayCheckin } = await supabase
     .from('checkins')
     .select('id')
@@ -156,7 +155,6 @@ async function saveDraw(userId, cardId) {
   await supabase.from('draws').insert({ user_id: userId, card_id: cardId, draw_date: today() });
 }
 
-// 新增卡片到蒐集，回傳是否為新卡
 async function collectCard(userId, cardId) {
   const { data: existing } = await supabase
     .from('user_cards')
@@ -171,7 +169,6 @@ async function collectCard(userId, cardId) {
   return { isNew: true };
 }
 
-// 取得唯一蒐集卡片數
 async function getCollectedCardCount(userId) {
   const { count } = await supabase
     .from('user_cards')
